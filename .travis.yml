@@ -2,37 +2,31 @@ os: linux
 dist: focal
 language: node_js
 node_js:
-      - 18
+  - 18
 cache: npm
+services:
+  - docker
 jobs:
   include:
     - stage: build
       install:
         - npm install
-
     - stage: test
+      before_install:
+        - docker run -d --name pitonisa-container jairobankhardt/pitonisa
+        - sleep 10 # Espera um pouco para que o container da Pitonisa inicie
       script:
-        - # Rodar o docker jairobankhardt/pitonisa
-        - docker run -d -p 8080:8080 jairobankhardt/pitonisa
-        - # Fazer um teste o OWASP ZAP no host, ignorando warnings
-        - zap -d localhost:8080 -ZAP_API_KEY=zap-api-key -ZAP_PROXY_HOST=127.0.0.1 -ZAP_PROXY_PORT=8080 -ZAP_PROXY_IGNORE_WARNINGS=true -ZAP_REPORT_FILENAME=report.xml
-        - # Limpar o container do OWASP ZAP
-        - docker stop jairobankhardt/pitonisa
-        - docker rm jairobankhardt/pitonisa
-
-    - stage: deploy
+        # Rodar os testes com OWASP ZAP no host e ignorar os warnings
+        - docker run --network host owasp/zap2docker-stable zap-baseline.py -t "http://localhost:8080" -I
       after_script:
-        # Em caso de sucesso enviará uma mensagem para o telegram
+        # Em caso de sucesso, enviar uma mensagem para o Telegram
         - bash ./telegram_notification.sh
         - echo "Pitonisa está on"
-
-      deploy:
-        provider: netlify
-        on:
-          branch: main
-        production_branch: main
-        target_branch: main
-        skip_cleanup: true
-        script:
-          - npm run build
+      after_failure:
+        # Em caso de falha, você pode adicionar ações para lidar com a falha, se necessário
+        - echo "Testes com OWASP ZAP falharam"
+    - stage: deploy
+      script:
+        # Implemente a aplicação para o Netlify (substitua com seus comandos de implantação reais)
+        - npm run build
           - netlify deploy --prod --dir=./build
