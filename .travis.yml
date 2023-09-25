@@ -10,7 +10,7 @@ jobs:
 
     - stage: test
       script:
-        - npm start &
+        - npm start
         
     - stage: deploy
       after_script:
