@@ -12,10 +12,27 @@ jobs:
 
     - stage: test
       script:
-        - npm start
-        
+        - # Rodar o docker jairobankhardt/pitonisa
+        - docker run -d -p 8080:8080 jairobankhardt/pitonisa
+        - # Fazer um teste o OWASP ZAP no host, ignorando warnings
+        - zap -d localhost:8080 -ZAP_API_KEY=zap-api-key -ZAP_PROXY_HOST=127.0.0.1 -ZAP_PROXY_PORT=8080 -ZAP_PROXY_IGNORE_WARNINGS=true -ZAP_REPORT_FILENAME=report.xml
+        - # Limpar o container do OWASP ZAP
+        - docker stop jairobankhardt/pitonisa
+        - docker rm jairobankhardt/pitonisa
+
     - stage: deploy
       after_script:
         # Em caso de sucesso enviará uma mensagem para o telegram
         - bash ./telegram_notification.sh
         - echo "Pitonisa está on"
+
+      deploy:
+        provider: netlify
+        on:
+          branch: main
+        production_branch: main
+        target_branch: main
+        skip_cleanup: true
+        script:
+          - npm run build
+          - netlify deploy --prod --dir=./build
