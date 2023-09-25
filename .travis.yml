@@ -16,7 +16,7 @@ jobs:
         - docker run -d --name pitonisa-container jairobankhardt/pitonisa
         - sleep 10 # Espera um pouco para que o container da Pitonisa inicie
       script:
-        - npm start
+        - npm start &
         # Rodar os testes com OWASP ZAP no host e ignorar os warnings
         - docker run --add-host=host.docker.internal:host-gateway owasp/zap2docker-stable zap-baseline.py -t "http://host.docker.internal:3000" -I
       after_failure:
