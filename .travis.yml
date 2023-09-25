@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+      - 18
+cache: npm
+jobs:
+  include:
+    - stage: build
+      install:
+        - npm install
+
+    - stage: test
+      script:
+        - npm start &
+        
+    - stage: deploy
+      after_script:
+        # Em caso de sucesso enviará uma mensagem para o telegram
+        - bash ./telegram_notification.sh
+        - echo "Pitonisa está on"
