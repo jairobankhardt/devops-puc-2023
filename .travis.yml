@@ -17,7 +17,7 @@ jobs:
         - sleep 10 # Espera um pouco para que o container da Pitonisa inicie
       script:
         # Rodar os testes com OWASP ZAP no host e ignorar os warnings
-        - docker run --network host owasp/zap2docker-stable zap-baseline.py -t "http://localhost:8080" -I
+        - docker run --add-host=host.docker.internal:host-gateway --network host owasp/zap2docker-stable zap-baseline.py -t "http://host.docker.internal:8080" -I
       after_script:
         # Em caso de sucesso, enviar uma mensagem para o Telegram
         - bash ./telegram_notification.sh
