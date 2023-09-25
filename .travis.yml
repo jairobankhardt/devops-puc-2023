@@ -17,7 +17,7 @@ jobs:
         - sleep 10 # Espera um pouco para que o container da Pitonisa inicie
       script:
       - npm start &
-        # Testes com OWASP ZAP
+        # Testes - OWASP ZAP
         - docker run --network host owasp/zap2docker-stable zap-baseline.py -t "http://localhost:3000" -I
       after_failure:
 
