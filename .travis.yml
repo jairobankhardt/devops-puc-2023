@@ -18,7 +18,7 @@ jobs:
       script:
         - npm start
         # Rodar os testes com OWASP ZAP no host e ignorar os warnings
-        - docker run --add-host=host.docker.internal:host-gateway --network host owasp/zap2docker-stable zap-baseline.py -t "http://host.docker.internal:3000" -I
+        - docker run --add-host=host.docker.internal:host-gateway owasp/zap2docker-stable zap-baseline.py -t "http://host.docker.internal:3000" -I
       after_failure:
         # Em caso de falha, você pode adicionar ações para lidar com a falha, se necessário
         - echo "Testes com OWASP ZAP falharam"
@@ -26,7 +26,7 @@ jobs:
       script:
         # Implemente a aplicação para o Netlify (substitua com seus comandos de implantação reais)
         - npm run build
-          - netlify deploy --prod --dir=./build
+        - netlify deploy --prod --dir=./build
       after_script:
         # Em caso de sucesso, enviar uma mensagem para o Telegram
         - bash ./telegram_notification.sh
