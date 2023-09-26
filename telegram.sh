@@ -6,33 +6,30 @@ BOT_URL="https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage"
 # Set formatting for the message. Can be either "Markdown" or "HTML"
 PARSE_MODE="Markdown"
 
-# echo "${CI_JOB_STATUS}"
-
-echo "${CI_JOB_STATUS}"
-
-# echo "${BOT_URL}"
-# echo "$TELEGRAM_CHAT_ID"
-# echo "${TELEGRAM_CHAT_ID}"
-
-# echo "${PARSE_MODE}"
+# Use built-in Travis variables to check if all previous steps passed:
+if [ $TRAVIS_TEST_RESULT -ne 0 ]; then
+    build_status="failed"
+else
+    build_status="succeeded"
+fi
 
 # Define send message function. parse_mode can be changed to
 # HTML, depending on how you want to format your message:
+send_msg () {
+    curl -s -X POST ${BOT_URL} -d chat_id=$TELEGRAM_CHAT_ID \
+        -d text="$1" -d parse_mode=${PARSE_MODE}
+}
 
-MESSAGE="
+# Send message to the bot with some pertinent details about the job
+# Note that for Markdown, you need to escape any backtick (inline-code)
+# characters, since they're reserved in bash
+send_msg "
 -------------------------------------
-Gitlab build * ${CI_JOB_STATUS}!*
-\`Repository:  ${CI_PROJECT_DIR}\`
-\`Branch:      ${CI_COMMIT_BRANCH}\`
+Travis build *${build_status}!*
+\`Repository:  ${TRAVIS_REPO_SLUG}\`
+\`Branch:      ${TRAVIS_BRANCH}\`
 *Commit Msg:*
-${CI_COMMIT_MESSAGE}
-)
+${TRAVIS_COMMIT_MESSAGE}
+[Job Log here](${TRAVIS_JOB_WEB_URL})
 --------------------------------------
 "
-
-# echo "${MESSAGE}"
-# echo "$MESSAGE"
-
-curl -s -X POST ${BOT_URL} -d chat_id=$TELEGRAM_CHAT_ID -d text="${MESSAGE}" -d parse_mode=${PARSE_MODE}
-
-
