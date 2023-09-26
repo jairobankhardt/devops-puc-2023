@@ -14,7 +14,7 @@ jobs:
     - stage: test
       before_install:
         - docker run -d --name pitonisa-container jairobankhardt/pitonisa
-        - sleep 10 # Pausa para que o container da Pitonisa inicie
+        - sleep 10
       script:
       - npm start &
         # Testes - OWASP ZAP
