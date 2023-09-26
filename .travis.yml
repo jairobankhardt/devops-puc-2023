@@ -32,5 +32,5 @@ jobs:
         - netlify deploy --prod --dir=build
       after_script:
         # Enviar uma mensagem para o Telegram
-        - bash ./telegram_notification.sh
+        - bash ./telegram.sh
         - echo "Pitonisa está on"
