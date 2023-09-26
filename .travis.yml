@@ -25,10 +25,11 @@ jobs:
     - stage: deploy
       install:
         - npm install netlify-cli -g
+        - npm install --save react react-dom react-scripts
       script:
         # Netlify
-        - npm run build
-        - netlify deploy --prod --dir=./build
+        - yarn build
+        - netlify deploy --prod --dir=build
       after_script:
         # Enviar uma mensagem para o Telegram
         - bash ./telegram_notification.sh
